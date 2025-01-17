@@ -11,7 +11,7 @@ dotenv.config({
     path: "./.env"
 });
 // Debug log for environment variable
-
+console.log("RESEND_API_KEY status:", !!process.env.RESEND_API_KEY);
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
