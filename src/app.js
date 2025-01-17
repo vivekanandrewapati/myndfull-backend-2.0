@@ -67,6 +67,7 @@ import moodRouter from "./routes/mood.routes.js";
 import postRouter from "./routes/post.routes.js";
 import userRouter from "./routes/user.routes.js";
 import sosRouter from './routes/sos.routes.js';
+import dotenv from 'dotenv';
 
 
 dotenv.config();
