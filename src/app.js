@@ -78,10 +78,17 @@ const app = express();
 const corsOptions = {
     origin: [
         'http://localhost:5173',
+        'https://myndfull-frontend-2-0-9ufk.vercel.app',  // Your Vercel frontend URL
         process.env.CORS_ORIGIN
     ],
-    credentials: true,  // This is crucial
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
+    credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: [
+        'Content-Type',
+        'Authorization',
+        'X-Requested-With',
+        'Accept'
+    ]
 };
 
 app.use(cors(corsOptions));
