@@ -101,7 +101,8 @@ const loginUser = asyncHandler(async (req, res) => {
     const options = {
         httpOnly: true,
         secure: true,
-        sameSite: 'None', // Required for cross-origin
+        sameSite: 'None',
+        path: '/',
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
 
@@ -136,9 +137,10 @@ const logoutUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: process.env.NODE_ENV === "production",
-        sameSite: 'strict',
-        maxAge: 24 * 60 * 60 * 1000
+        secure: true,
+        sameSite: 'None',
+        path: '/',
+        maxAge: 0
     }
 
 
@@ -177,7 +179,10 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         }
         const options = {
             httpOnly: true,
-            secure: true
+            secure: true,
+            sameSite: 'None',
+            path: '/',
+            maxAge: 24 * 60 * 60 * 1000
         }
 
         const { accessToken, newRefreshToken } = await generateAccessAndRefereshTokens(user._id)
