@@ -77,21 +77,13 @@ const registerUser = asyncHandler(async (req, res) => {
 });
 
 const loginUser = asyncHandler(async (req, res) => {
-
-    const { email, username, password } = req.body;
-
-    // if (!username && !email) {
-    //     throw new ApiError(400, "Please provide either username or email")
-    // }
+    const { email, password } = req.body;
 
     if (!email) {
-        throw new ApiError(400, "Please provide email")
+        throw new ApiError(400, "Email is required")
     }
 
     const user = await User.findOne({ email });
-    // const user = await User.findOne({
-    //     $or: [{ username }, { email }]
-    // })
 
     if (!user) {
         throw new ApiError(400, "user not found")
@@ -108,7 +100,9 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: true,
+        sameSite: 'None', // Required for cross-origin
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
 
     return res
@@ -124,9 +118,7 @@ const loginUser = asyncHandler(async (req, res) => {
                 "User logged In Successfully"
             )
         )
-
-
-})
+});
 
 const logoutUser = asyncHandler(async (req, res) => {
 
@@ -144,7 +136,9 @@ const logoutUser = asyncHandler(async (req, res) => {
 
     const options = {
         httpOnly: true,
-        secure: true
+        secure: process.env.NODE_ENV === "production",
+        sameSite: 'strict',
+        maxAge: 24 * 60 * 60 * 1000
     }
 
 
@@ -300,11 +294,32 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 
 
 
+const checkAuth = asyncHandler(async (req, res) => {
+    try {
+        return res.status(200).json(
+            new ApiResponse(
+                200,
+                { authenticated: true, user: req.user },
+                "Authentication successful"
+            )
+        );
+    } catch (error) {
+        return res.status(401).json(
+            new ApiResponse(
+                401,
+                { authenticated: false },
+                "Authentication failed"
+            )
+        );
+    }
+});
+
 export {
     registerUser,
     loginUser,
     getCurrentUser,
     updateUserProfile,
     logoutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    checkAuth // Add checkAuth to exports
 }

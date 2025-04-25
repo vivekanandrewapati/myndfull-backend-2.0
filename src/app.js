@@ -79,10 +79,8 @@ const corsOptions = {
     origin: [
         'http://localhost:5173',
         process.env.CORS_ORIGIN
-
-        // Add your Netlify URL here
     ],
-    credentials: true,
+    credentials: true,  // This is crucial
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS']
 };
 

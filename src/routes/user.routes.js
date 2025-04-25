@@ -58,7 +58,8 @@ import {
     getCurrentUser,
     updateUserProfile,
     logoutUser,
-    refreshAccessToken
+    refreshAccessToken,
+    checkAuth
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
@@ -79,13 +80,17 @@ router.route("/register").post(
 router.route("/login").post(loginUser)
 
 //secured routes
-
-
 router.route("/logout").post(verifyJWT, logoutUser)
-
 router.route("/refresh-token").post(refreshAccessToken)
 router.route("/current-user").get(verifyJWT, getCurrentUser)
 router.route("/update-account").patch(verifyJWT, updateUserProfile)
+router.route("/check-auth").get(verifyJWT, (req, res) => {
+    res.status(200).json({
+        authenticated: true,
+        user: req.user
+    });
+});
 
-// router.route("/avatar").patch(verifyJWT, upload.single("avatar"), updateUserAvatar)
 export default router
+
+
