@@ -14,11 +14,11 @@ const generateAccessAndRefereshTokens = async (userId) => {
         const accessToken = user.generateAccessToken();
 
         user.refreshToken = refreshToken;
-        await user.save(({ validateBeforeSave: false }));
+        await user.save({ validateBeforeSave: false }); // Fixed missing braces
 
         return { accessToken, refreshToken };
     } catch (error) {
-        throw new ApiError(500, "something went wrong while generating refresh and access token")
+        throw new ApiError(500, "Something went wrong while generating refresh and access token")
     }
 }
 

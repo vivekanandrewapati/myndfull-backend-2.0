@@ -63,6 +63,7 @@ import {
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
+import { ApiResponse } from "../utils/ApiResponse.js"; 
 
 const router = Router()
 
@@ -85,10 +86,13 @@ router.route("/refresh-token").post(refreshAccessToken)
 router.route("/current-user").get(verifyJWT, getCurrentUser)
 router.route("/update-account").patch(verifyJWT, updateUserProfile)
 router.route("/check-auth").get(verifyJWT, (req, res) => {
-    res.status(200).json({
-        authenticated: true,
-        user: req.user
-    });
+    res.status(200).json(
+        new ApiResponse(
+            200,
+            { authenticated: true, user: req.user },
+            "Authentication successful"
+        )
+    );
 });
 
 export default router
