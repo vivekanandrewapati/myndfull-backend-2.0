@@ -19,7 +19,6 @@ const corsOptions = {
         'http://localhost:5173',
         'https://myndfull-frontend-2-0-9ufk.vercel.app',
         'https://myndfull.vercel.app',
-        // Your Vercel frontend URL
         process.env.CORS_ORIGIN
     ],
     credentials: true,
@@ -30,9 +29,7 @@ const corsOptions = {
         'X-Requested-With',
         'Accept'
     ],
-    exposedHeaders: ['set-cookie'],  // Add this line
-    sameSite: 'none',  // Add this line
-    secure: true       // Add this line
+    exposedHeaders: ['set-cookie']
 };
 
 app.use(cors(corsOptions));

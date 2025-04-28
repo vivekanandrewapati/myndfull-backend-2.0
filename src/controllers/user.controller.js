@@ -90,10 +90,10 @@ const registerUser = asyncHandler(async (req, res) => {
 const getCookieOptions = () => {
     return {
         httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+        secure: true, // Always true for production
+        sameSite: 'None', // Required for cross-origin
         path: '/',
-        domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined,
+        // Remove domain setting as it's restricting cookies
         maxAge: 24 * 60 * 60 * 1000 // 24 hours
     }
 }
