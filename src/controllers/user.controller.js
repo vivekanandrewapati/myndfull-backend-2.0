@@ -65,16 +65,38 @@ const registerUser = asyncHandler(async (req, res) => {
     const user = await User.create(userData);
 
     // 7. Remove sensitive fields and send response
+    const { accessToken, refreshToken } = await generateAccessAndRefereshTokens(user._id);
     const createdUser = await User.findById(user._id).select("-password -refreshToken");
 
     if (!createdUser) {
         throw new ApiError(500, "Error while registering user");
     }
 
-    return res.status(201).json(
-        new ApiResponse(201, createdUser, "User registered successfully")
-    );
+    const options = getCookieOptions();
+
+    return res
+        .status(201)
+        .cookie("accessToken", accessToken, options)
+        .cookie("refreshToken", refreshToken, options)
+        .json(
+            new ApiResponse(201, {
+                user: createdUser,
+                accessToken,
+                refreshToken
+            }, "User registered successfully")
+        );
 });
+
+const getCookieOptions = () => {
+    return {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
+        path: '/',
+        domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : undefined,
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}
 
 const loginUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
@@ -98,27 +120,16 @@ const loginUser = asyncHandler(async (req, res) => {
 
     const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
-    const options = {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None',
-        path: '/',
-        domain: '.vercel.app',
-        maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    }
+    const options = getCookieOptions();
 
     return res
         .status(200)
         .cookie("accessToken", accessToken, options)
         .cookie("refreshToken", refreshToken, options)
         .json(
-            new ApiResponse(
-                200,
-                {
-                    user: loggedInUser, accessToken, refreshToken
-                },
-                "User logged In Successfully"
-            )
+            new ApiResponse(200, {
+                user: loggedInUser, accessToken, refreshToken
+            }, "User logged In Successfully")
         )
 });
 
@@ -137,21 +148,16 @@ const logoutUser = asyncHandler(async (req, res) => {
     )
 
     const options = {
-        httpOnly: true,
-        secure: true,
-        sameSite: 'None',
-        path: '/',
+        ...getCookieOptions(),
         maxAge: 0
     }
-
-
 
     return res
         .status(200)
         .clearCookie("accessToken", options)
         .clearCookie("refreshToken", options)
         .json(new ApiResponse(200, {}, "User logged Out"))
-})
+});
 
 const refreshAccessToken = asyncHandler(async (req, res) => {
     const incomingRefreshToken = req.cookies.refreshToken || req.body.refreshToken;
@@ -180,10 +186,11 @@ const refreshAccessToken = asyncHandler(async (req, res) => {
         }
         const options = {
             httpOnly: true,
-            secure: true,
-            sameSite: 'None',
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'None' : 'Lax',
             path: '/',
-            maxAge: 24 * 60 * 60 * 1000
+            domain: process.env.NODE_ENV === 'production' ? '.vercel.app' : 'localhost',
+            maxAge: 24 * 60 * 60 * 1000 // 24 hours
         }
 
         const { accessToken, newRefreshToken } = await generateAccessAndRefereshTokens(user._id)
@@ -300,25 +307,27 @@ const updateUserProfile = asyncHandler(async (req, res) => {
 
 
 
-const checkAuth = asyncHandler(async (req, res) => {
-    try {
-        return res.status(200).json(
-            new ApiResponse(
-                200,
-                { authenticated: true, user: req.user },
-                "Authentication successful"
-            )
-        );
-    } catch (error) {
-        return res.status(401).json(
-            new ApiResponse(
-                401,
-                { authenticated: false },
-                "Authentication failed"
-            )
-        );
-    }
-});
+// const checkAuth = asyncHandler(async (req, res) => {
+//     try {
+//         console.log("Authenticated User:", req.user);  // Add this line to log user data
+//         return res.status(200).json(
+//             new ApiResponse(
+//                 200,
+//                 { authenticated: true, user: req.user },
+//                 "Authentication successful"
+//             )
+//         );
+//     } catch (error) {
+//         console.error("Error in checkAuth:", error);  // Add logging for debugging
+//         return res.status(401).json(
+//             new ApiResponse(
+//                 401,
+//                 { authenticated: false },
+//                 "Authentication failed"
+//             )
+//         );
+//     }
+// });
 
 export {
     registerUser,
@@ -327,5 +336,5 @@ export {
     updateUserProfile,
     logoutUser,
     refreshAccessToken,
-    checkAuth // Add checkAuth to exports
+    // checkAuth // Add checkAuth to exports
 }

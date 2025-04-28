@@ -59,7 +59,7 @@ import {
     updateUserProfile,
     logoutUser,
     refreshAccessToken,
-    checkAuth
+    // checkAuth
 } from "../controllers/user.controller.js";
 import { upload } from "../middlewares/multer.middleware.js"
 import { verifyJWT } from "../middlewares/auth.middleware.js"
@@ -85,15 +85,15 @@ router.route("/logout").post(verifyJWT, logoutUser)
 router.route("/refresh-token").post(refreshAccessToken)
 router.route("/current-user").get(verifyJWT, getCurrentUser)
 router.route("/update-account").patch(verifyJWT, updateUserProfile)
-router.route("/check-auth").get(verifyJWT, (req, res) => {
-    res.status(200).json(
-        new ApiResponse(
-            200,
-            { authenticated: true, user: req.user },
-            "Authentication successful"
-        )
-    );
-});
+// router.route("/check-auth").get(verifyJWT, (req, res) => {
+//     res.status(200).json(
+//         new ApiResponse(
+//             200,
+//             { authenticated: true, user: req.user },
+//             "Authentication successful"
+//         )
+//     );
+// });
 
 export default router
 
